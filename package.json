@@ -28,8 +28,8 @@
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "drizzle-orm": "^0.31.4",
-    "drizzle-zod": "^0.5.1",
+    "drizzle-orm": "^0.40.0",
+    "drizzle-zod": "^0.7.0",
     "lucide-react": "^0.400.0",
     "next": "^15.1.9",
     "next-auth": "5.0.0-beta.25",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.1.8",
-    "drizzle-kit": "^0.22.8",
+    "drizzle-kit": "^0.30.0",
     "vitest": "^2.1.8"
   },
   "prettier": {

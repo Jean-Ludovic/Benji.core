@@ -1,4 +1,6 @@
 import { NextRequest } from 'next/server';
+
+export const dynamic = 'force-dynamic';
 import { getTaskById, updateTask, deleteTask } from '@/lib/tasks/service';
 import { UpdateTaskSchema } from '@/lib/tasks/validation';
 import { toErrorResponse, Errors } from '@/lib/errors';

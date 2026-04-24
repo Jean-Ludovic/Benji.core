@@ -19,7 +19,7 @@ import { db } from '@/lib/db';
 import { register } from '@/lib/auth/actions';
 import bcrypt from 'bcryptjs';
 
-const mockDb = db as {
+const mockDb = db as unknown as {
   select: ReturnType<typeof vi.fn>;
   insert: ReturnType<typeof vi.fn>;
 };

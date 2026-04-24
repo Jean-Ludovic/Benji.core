@@ -21,7 +21,7 @@ import {
 } from '@/lib/tasks/service';
 import { AppError } from '@/lib/errors';
 
-const mockDb = db as {
+const mockDb = db as unknown as {
   select: ReturnType<typeof vi.fn>;
   insert: ReturnType<typeof vi.fn>;
   update: ReturnType<typeof vi.fn>;
@@ -55,7 +55,7 @@ describe('createTask', () => {
   });
 
   it('maps dueDate string to a Date object', async () => {
-    await createTask({ title: 'T', dueDate: '2025-06-01T12:00:00.000Z' });
+    await createTask({ title: 'T', status: 'todo', dueDate: '2025-06-01T12:00:00.000Z' });
     const values = mockDb.insert.mock.results[0].value.values;
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({ dueDate: new Date('2025-06-01T12:00:00.000Z') })
@@ -63,7 +63,7 @@ describe('createTask', () => {
   });
 
   it('sets description to null when omitted', async () => {
-    await createTask({ title: 'T' });
+    await createTask({ title: 'T', status: 'todo' });
     const values = mockDb.insert.mock.results[0].value.values;
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({ description: null })
@@ -71,7 +71,7 @@ describe('createTask', () => {
   });
 
   it('defaults status to todo when not provided', async () => {
-    await createTask({ title: 'T' });
+    await createTask({ title: 'T', status: 'todo' });
     const values = mockDb.insert.mock.results[0].value.values;
     expect(values).toHaveBeenCalledWith(
       expect.objectContaining({ status: 'todo' })
