@@ -70,27 +70,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           .from(users)
           .where(eq(users.id, user.id))
           .limit(1);
-        token.role = dbUser?.role ?? 'CLIENT';
+        token.role = (dbUser?.role ?? 'CLIENT') as 'CLIENT' | 'ARTISAN' | 'ADMIN';
         token.onboardingDone = dbUser?.onboardingDone ?? false;
       }
-      // Allow refreshing token data (e.g. after onboarding)
-      if (trigger === 'update' && token.id) {
+      if (trigger === 'update' && typeof token.id === 'string') {
         const [dbUser] = await db
           .select({ role: users.role, onboardingDone: users.onboardingDone })
           .from(users)
           .where(eq(users.id, token.id))
           .limit(1);
         if (dbUser) {
-          token.role = dbUser.role;
+          token.role = dbUser.role as 'CLIENT' | 'ARTISAN' | 'ADMIN';
           token.onboardingDone = dbUser.onboardingDone;
         }
       }
       return token;
     },
     async session({ session, token }) {
-      session.user.id = token.id;
-      session.user.role = token.role;
-      session.user.onboardingDone = token.onboardingDone;
+      session.user.id = token.id as string;
+      session.user.role = token.role as 'CLIENT' | 'ARTISAN' | 'ADMIN';
+      session.user.onboardingDone = token.onboardingDone as boolean;
       return session;
     }
   }

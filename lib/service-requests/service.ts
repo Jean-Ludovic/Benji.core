@@ -72,7 +72,12 @@ export async function updateRequest(
 
   const [updated] = await db
     .update(serviceRequests)
-    .set({ ...data, updatedAt: new Date() })
+    .set({
+      ...data,
+      budgetMin: data.budgetMin?.toString(),
+      budgetMax: data.budgetMax?.toString(),
+      updatedAt: new Date()
+    })
     .where(eq(serviceRequests.id, id))
     .returning();
   return updated;

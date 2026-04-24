@@ -12,12 +12,23 @@ import {
 } from '@/components/ui/breadcrumb';
 
 const ROUTE_LABELS: Record<string, string> = {
-  tasks: 'Tasks'
+  client: 'Espace client',
+  artisan: 'Espace artisan',
+  admin: 'Administration',
+  requests: 'Demandes',
+  quotes: 'Devis',
+  projects: 'Projets',
+  profile: 'Profil',
+  services: 'Services',
+  messages: 'Messages',
+  new: 'Nouvelle demande',
+  settings: 'Paramètres',
+  users: 'Utilisateurs',
+  artisans: 'Artisans'
 };
 
 export function DashboardBreadcrumb() {
   const pathname = usePathname();
-
   const segments = pathname.split('/').filter(Boolean);
 
   return (
@@ -25,7 +36,7 @@ export function DashboardBreadcrumb() {
       <BreadcrumbList>
         <BreadcrumbItem>
           <BreadcrumbLink asChild>
-            <Link href="/tasks">Dashboard</Link>
+            <Link href="/">Fastoche</Link>
           </BreadcrumbLink>
         </BreadcrumbItem>
 
