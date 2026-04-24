@@ -4,6 +4,8 @@ import { eq } from 'drizzle-orm';
 import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
 import { users } from '@/lib/auth/schema';
+import { auth } from '@/lib/auth';
+import { signIn } from '@/lib/auth';
 
 type RegisterResult = { error: string } | { success: true };
 
@@ -33,6 +35,22 @@ export async function register(formData: FormData): Promise<RegisterResult> {
   const hashed = await bcrypt.hash(password, 12);
 
   await db.insert(users).values({ email, name, password: hashed });
+
+  return { success: true };
+}
+
+type SetRoleResult = { error: string } | { success: true };
+
+export async function setUserRole(
+  role: 'CLIENT' | 'ARTISAN'
+): Promise<SetRoleResult> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: 'Not authenticated.' };
+
+  await db
+    .update(users)
+    .set({ role, onboardingDone: true })
+    .where(eq(users.id, session.user.id));
 
   return { success: true };
 }

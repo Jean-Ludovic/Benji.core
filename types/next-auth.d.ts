@@ -4,6 +4,16 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
+      role: 'CLIENT' | 'ARTISAN' | 'ADMIN';
+      onboardingDone: boolean;
     } & DefaultSession['user'];
+  }
+}
+
+declare module 'next-auth/jwt' {
+  interface JWT {
+    id: string;
+    role: 'CLIENT' | 'ARTISAN' | 'ADMIN';
+    onboardingDone: boolean;
   }
 }

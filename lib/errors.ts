@@ -12,11 +12,15 @@ export class AppError extends Error {
 
 export const Errors = {
   notFound: (resource: string) =>
-    new AppError('NOT_FOUND', `${resource} not found`, 404),
+    new AppError('NOT_FOUND', `${resource} introuvable`, 404),
   badRequest: (message: string, details?: Record<string, unknown>) =>
     new AppError('BAD_REQUEST', message, 400, details),
+  forbidden: () =>
+    new AppError('FORBIDDEN', 'Accès refusé', 403),
+  unauthorized: () =>
+    new AppError('UNAUTHORIZED', 'Non authentifié', 401),
   internal: () =>
-    new AppError('INTERNAL_ERROR', 'An unexpected error occurred', 500)
+    new AppError('INTERNAL_ERROR', 'Une erreur inattendue est survenue', 500)
 };
 
 type ErrorBody = {

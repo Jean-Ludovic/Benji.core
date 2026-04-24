@@ -1,7 +1,7 @@
 import 'server-only';
 
 import NextAuth from 'next-auth';
-import GitHub from 'next-auth/providers/github';
+import LinkedIn from 'next-auth/providers/linkedin';
 import Google from 'next-auth/providers/google';
 import Credentials from 'next-auth/providers/credentials';
 import { DrizzleAdapter } from '@auth/drizzle-adapter';
@@ -26,7 +26,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   }),
   session: { strategy: 'jwt' },
   providers: [
-    GitHub,
+    LinkedIn,
     Google,
     Credentials({
       credentials: {
@@ -62,12 +62,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   ],
   callbacks: {
     ...authConfig.callbacks,
-    async jwt({ token, user }) {
-      if (user?.id) token.id = user.id;
+    async jwt({ token, user, trigger }) {
+      if (user?.id) {
+        token.id = user.id;
+        const [dbUser] = await db
+          .select({ role: users.role, onboardingDone: users.onboardingDone })
+          .from(users)
+          .where(eq(users.id, user.id))
+          .limit(1);
+        token.role = dbUser?.role ?? 'CLIENT';
+        token.onboardingDone = dbUser?.onboardingDone ?? false;
+      }
+      // Allow refreshing token data (e.g. after onboarding)
+      if (trigger === 'update' && token.id) {
+        const [dbUser] = await db
+          .select({ role: users.role, onboardingDone: users.onboardingDone })
+          .from(users)
+          .where(eq(users.id, token.id))
+          .limit(1);
+        if (dbUser) {
+          token.role = dbUser.role;
+          token.onboardingDone = dbUser.onboardingDone;
+        }
+      }
       return token;
     },
     async session({ session, token }) {
-      if (token?.id) session.user.id = token.id as string;
+      session.user.id = token.id;
+      session.user.role = token.role;
+      session.user.onboardingDone = token.onboardingDone;
       return session;
     }
   }

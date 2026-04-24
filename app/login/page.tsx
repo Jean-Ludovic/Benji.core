@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
-import { CheckSquare, Loader2 } from 'lucide-react';
+import { Loader2, Paintbrush } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -17,7 +17,10 @@ import { register } from '@/lib/auth/actions';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [tab, setTab] = useState<'login' | 'signup'>('login');
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get('tab') === 'signup' ? 'signup' : 'login';
+
+  const [tab, setTab] = useState<'login' | 'signup'>(defaultTab);
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
 
@@ -36,9 +39,10 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError('Invalid email or password.');
+        setError('Email ou mot de passe incorrect.');
       } else {
-        router.push('/tasks');
+        router.push('/onboarding');
+        router.refresh();
       }
     });
   }
@@ -51,7 +55,7 @@ export default function LoginPage() {
     const confirm = formData.get('confirm') as string;
 
     if (password !== confirm) {
-      setError('Passwords do not match.');
+      setError('Les mots de passe ne correspondent pas.');
       return;
     }
 
@@ -70,35 +74,54 @@ export default function LoginPage() {
       });
 
       if (signInResult?.error) {
-        setError('Account created but sign-in failed. Try signing in manually.');
+        setError('Compte créé mais connexion échouée. Essayez de vous connecter.');
       } else {
-        router.push('/tasks');
+        router.push('/onboarding');
+        router.refresh();
       }
     });
   }
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
+      {/* Left panel */}
       <div className="hidden lg:flex flex-col justify-between bg-primary p-10 text-primary-foreground">
-        <div className="flex items-center gap-2 text-lg font-semibold">
-          <CheckSquare className="h-6 w-6" />
-          <span>TaskFlow</span>
+        <div className="flex items-center gap-2 text-lg font-bold">
+          <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
+            <Paintbrush className="h-4 w-4" />
+          </div>
+          <span>Fastoche</span>
         </div>
-        <div className="space-y-2">
-          <blockquote className="text-2xl font-light leading-snug">
-            "Organise your work.<br />Ship what matters."
+        <div className="space-y-3">
+          <blockquote className="text-3xl font-light leading-snug">
+            "Trouvez le bon artisan,<br />au bon prix, maintenant."
           </blockquote>
           <p className="text-sm text-primary-foreground/60">
-            TaskFlow — task management prototype
+            Peinture · Plâtrerie · Rénovation · Décoration
           </p>
+        </div>
+        <div className="grid grid-cols-3 gap-4 text-center">
+          {[
+            { value: '10 000+', label: 'Artisans' },
+            { value: '50 000+', label: 'Projets' },
+            { value: '4.8/5', label: 'Note moyenne' }
+          ].map(({ value, label }) => (
+            <div key={label}>
+              <p className="text-2xl font-bold">{value}</p>
+              <p className="text-xs text-primary-foreground/60">{label}</p>
+            </div>
+          ))}
         </div>
       </div>
 
+      {/* Right panel */}
       <div className="flex items-center justify-center p-8 bg-muted/40">
         <div className="w-full max-w-sm space-y-6">
           <div className="flex items-center gap-2 lg:hidden">
-            <CheckSquare className="h-5 w-5" />
-            <span className="font-semibold">TaskFlow</span>
+            <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
+              <Paintbrush className="h-3.5 w-3.5 text-white" />
+            </div>
+            <span className="font-bold text-lg">Fastoche</span>
           </div>
 
           <div className="flex rounded-lg border bg-background p-1 gap-1">
@@ -110,7 +133,7 @@ export default function LoginPage() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Sign in
+              Connexion
             </button>
             <button
               onClick={() => { setTab('signup'); setError(''); }}
@@ -120,7 +143,7 @@ export default function LoginPage() {
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Sign up
+              Inscription
             </button>
           </div>
 
@@ -128,8 +151,10 @@ export default function LoginPage() {
             {tab === 'login' ? (
               <>
                 <CardHeader>
-                  <CardTitle>Welcome back</CardTitle>
-                  <CardDescription>Sign in to access your tasks.</CardDescription>
+                  <CardTitle>Bon retour !</CardTitle>
+                  <CardDescription>
+                    Connectez-vous pour accéder à votre espace.
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <form onSubmit={handleLogin} className="space-y-3">
@@ -143,7 +168,7 @@ export default function LoginPage() {
                     <Input
                       name="password"
                       type="password"
-                      placeholder="Password"
+                      placeholder="Mot de passe"
                       required
                       autoComplete="current-password"
                     />
@@ -152,7 +177,7 @@ export default function LoginPage() {
                     )}
                     <Button type="submit" className="w-full" disabled={isPending}>
                       {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Sign in
+                      Se connecter
                     </Button>
                   </form>
 
@@ -161,7 +186,7 @@ export default function LoginPage() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-2 text-muted-foreground">or</span>
+                      <span className="bg-card px-2 text-muted-foreground">ou</span>
                     </div>
                   </div>
 
@@ -169,20 +194,20 @@ export default function LoginPage() {
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => signIn('github', { callbackUrl: '/tasks' })}
+                      onClick={() => signIn('linkedin', { callbackUrl: '/onboarding' })}
                       disabled={isPending}
                     >
-                      <GitHubIcon className="mr-2 h-4 w-4" />
-                      Continue with GitHub
+                      <LinkedInIcon className="mr-2 h-4 w-4" />
+                      Continuer avec LinkedIn
                     </Button>
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => signIn('google', { callbackUrl: '/tasks' })}
+                      onClick={() => signIn('google', { callbackUrl: '/onboarding' })}
                       disabled={isPending}
                     >
                       <GoogleIcon className="mr-2 h-4 w-4" />
-                      Continue with Google
+                      Continuer avec Google
                     </Button>
                   </div>
                 </CardContent>
@@ -190,9 +215,9 @@ export default function LoginPage() {
             ) : (
               <>
                 <CardHeader>
-                  <CardTitle>Create an account</CardTitle>
+                  <CardTitle>Créer un compte</CardTitle>
                   <CardDescription>
-                    Sign up with email or an OAuth provider.
+                    Rejoignez Fastoche gratuitement.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -200,7 +225,7 @@ export default function LoginPage() {
                     <Input
                       name="name"
                       type="text"
-                      placeholder="Full name"
+                      placeholder="Nom complet"
                       required
                       autoComplete="name"
                     />
@@ -214,14 +239,14 @@ export default function LoginPage() {
                     <Input
                       name="password"
                       type="password"
-                      placeholder="Password (min. 8 characters)"
+                      placeholder="Mot de passe (min. 8 caractères)"
                       required
                       autoComplete="new-password"
                     />
                     <Input
                       name="confirm"
                       type="password"
-                      placeholder="Confirm password"
+                      placeholder="Confirmer le mot de passe"
                       required
                       autoComplete="new-password"
                     />
@@ -230,7 +255,7 @@ export default function LoginPage() {
                     )}
                     <Button type="submit" className="w-full" disabled={isPending}>
                       {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                      Create account
+                      Créer mon compte
                     </Button>
                   </form>
 
@@ -239,7 +264,7 @@ export default function LoginPage() {
                       <span className="w-full border-t" />
                     </div>
                     <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card px-2 text-muted-foreground">or</span>
+                      <span className="bg-card px-2 text-muted-foreground">ou</span>
                     </div>
                   </div>
 
@@ -247,20 +272,20 @@ export default function LoginPage() {
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => signIn('github', { callbackUrl: '/tasks' })}
+                      onClick={() => signIn('linkedin', { callbackUrl: '/onboarding' })}
                       disabled={isPending}
                     >
-                      <GitHubIcon className="mr-2 h-4 w-4" />
-                      Sign up with GitHub
+                      <LinkedInIcon className="mr-2 h-4 w-4" />
+                      S&apos;inscrire avec LinkedIn
                     </Button>
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => signIn('google', { callbackUrl: '/tasks' })}
+                      onClick={() => signIn('google', { callbackUrl: '/onboarding' })}
                       disabled={isPending}
                     >
                       <GoogleIcon className="mr-2 h-4 w-4" />
-                      Sign up with Google
+                      S&apos;inscrire avec Google
                     </Button>
                   </div>
                 </CardContent>
@@ -269,7 +294,11 @@ export default function LoginPage() {
           </Card>
 
           <p className="text-center text-xs text-muted-foreground">
-            By continuing, you agree to our terms of service.
+            En continuant, vous acceptez nos{' '}
+            <a href="#" className="underline hover:text-foreground">
+              conditions d&apos;utilisation
+            </a>
+            .
           </p>
         </div>
       </div>
@@ -277,10 +306,10 @@ export default function LoginPage() {
   );
 }
 
-function GitHubIcon(props: React.SVGProps<SVGSVGElement>) {
+function LinkedInIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 0C5.37 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.757-1.333-1.757-1.089-.745.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.3-5.466-1.334-5.466-5.931 0-1.31.468-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.3 1.23a11.5 11.5 0 0 1 3.003-.404c1.02.005 2.047.138 3.003.404 2.29-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.61-2.807 5.628-5.479 5.921.43.372.823 1.102.823 2.222 0 1.606-.015 2.898-.015 3.293 0 .322.216.694.825.576C20.565 21.796 24 17.3 24 12c0-6.627-5.373-12-12-12z" />
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
   );
 }

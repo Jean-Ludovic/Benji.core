@@ -8,7 +8,7 @@ export default function Icon() {
     (
       <div
         style={{
-          background: '#1e293b',
+          background: '#F97316',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -17,18 +17,17 @@ export default function Icon() {
           borderRadius: '8px'
         }}
       >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="white"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <span
+          style={{
+            color: 'white',
+            fontSize: '18px',
+            fontWeight: '800',
+            fontFamily: 'sans-serif',
+            letterSpacing: '-1px'
+          }}
         >
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
+          F
+        </span>
       </div>
     ),
     { ...size }
