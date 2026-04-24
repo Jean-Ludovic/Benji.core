@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep -E \"\\\\.\\(json|ts|js|yml|yaml\\)$\")"
+      "Bash(grep -E \"\\\\.\\(json|ts|js|yml|yaml\\)$\")",
+      "Bash(pnpm install *)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm tsc *)"
     ]
   }
 }
