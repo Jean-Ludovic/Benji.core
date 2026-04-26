@@ -53,6 +53,20 @@ export async function listArtisans(opts?: {
   return rows.map((r) => ({ ...r.profile, user: r.user }));
 }
 
+export async function getArtisanByIdWithUser(id: string): Promise<ArtisanWithUser> {
+  const [row] = await db
+    .select({
+      profile: artisanProfiles,
+      user: { name: users.name, email: users.email, image: users.image }
+    })
+    .from(artisanProfiles)
+    .innerJoin(users, eq(artisanProfiles.userId, users.id))
+    .where(eq(artisanProfiles.id, id))
+    .limit(1);
+  if (!row) throw Errors.notFound('Artisan');
+  return { ...row.profile, user: row.user };
+}
+
 export async function upsertArtisanProfile(
   userId: string,
   data: Partial<NewArtisanProfile>
