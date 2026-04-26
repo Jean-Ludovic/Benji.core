@@ -23,7 +23,13 @@ export const authConfig: NextAuthConfig = {
       const isLoggedIn = !!auth?.user;
       const { pathname } = nextUrl;
 
-      if (isPublicPath(pathname)) return true;
+      if (isPublicPath(pathname)) {
+        if (!isLoggedIn) return true;
+        const onboardingDone = (auth.user as any).onboardingDone ?? false;
+        if (!onboardingDone) return Response.redirect(new URL('/onboarding', nextUrl));
+        const role = (auth.user as any).role ?? 'CLIENT';
+        return Response.redirect(new URL(roleDashboard(role), nextUrl));
+      }
 
       if (pathname === '/login') {
         if (!isLoggedIn) return true;
